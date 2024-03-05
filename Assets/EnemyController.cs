@@ -7,17 +7,20 @@ using UnityEngine.AI;
 public class EnemyController : MonoBehaviour
 {
     NavMeshAgent agent;
-    int health = 10;
+    [SerializeField] GameObject player;
+    [SerializeField] int health = 10;
+    [SerializeField] int damage = 8;
+    [SerializeField] int cashValue = 10;
     // Start is called before the first frame update
     void Awake()
     {
-        
+        agent = GetComponent<NavMeshAgent>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        UpdateAgentDestination();
     }
 
     private void RecieveDamage(object[] values)
@@ -36,14 +39,15 @@ public class EnemyController : MonoBehaviour
         if(health <= 0)
         {
             Destroy(gameObject);
+            player.SendMessage("RecieveCash", cashValue);
         }
     }
 
-    private void GetTargetPosition(object[] values)
+    private void UpdateAgentDestination()
     {
         try
         {
-            agent.destination = (Vector3)values[0];
+            agent.destination = player.transform.position;
         }
         catch(Exception e)
         {

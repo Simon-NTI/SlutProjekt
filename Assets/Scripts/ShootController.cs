@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class ShootController : MonoBehaviour
 {
+    [SerializeField] GameObject gunRay;
     GameObject camera;
     Vector3? debugSphereCenter;
     [SerializeField] GameObject debugSpherePrefab;
@@ -30,13 +31,7 @@ public class ShootController : MonoBehaviour
     {
         if (debugMode && drawPlayerRay)
         {
-            Debug.DrawLine(
-                camera.transform.position,
-                camera.transform.position + 500 * camera.transform.forward,
-                Color.blue,
-                0.0f,
-                false
-            );
+            Debug.DrawLine(camera.transform.position, camera.transform.position + 500 * camera.transform.forward);
         }
 
         Physics.Raycast(
@@ -55,6 +50,10 @@ public class ShootController : MonoBehaviour
                 values[0] = damage;
 
                 hit.collider.transform.gameObject.SendMessage("RecieveDamage", values);
+
+                LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
+                line.SetPosition(0, camera.transform.position);
+                line.SetPosition(1, hit.point);
             }
         }
         else
@@ -69,10 +68,5 @@ public class ShootController : MonoBehaviour
                 debugSphere.transform.position = (Vector3)debugSphereCenter;
             }
         }
-    }
-
-    private void UpdateAgentPosition()
-    {
-        
     }
 }
