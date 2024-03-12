@@ -9,6 +9,7 @@ public class EyeBallController : MonoBehaviour
     GameObject headCamera;
     [SerializeField] Vector2 sensitivity = new(5, 5);
     [SerializeField] float pitchLimit = 80;
+    float recoilDebt = 0;
     float cameraRotationX = 0;
 
 
@@ -32,13 +33,21 @@ public class EyeBallController : MonoBehaviour
         cameraRotationX = Math.Clamp(cameraRotationX, -pitchLimit, pitchLimit);
         headCamera.transform.localEulerAngles = new(-cameraRotationX, 0, 0);
     }
-    void Start()
-    {
-
-    }
 
     void Update()
     {
         
+    }
+
+    public void IncreaseRecoilDebt(object value)
+    {
+        try
+        {
+            recoilDebt += (int)value;
+        }
+        catch(Exception e)
+        {
+            print("Failed cast\n" + e.Message);
+        }
     }
 }

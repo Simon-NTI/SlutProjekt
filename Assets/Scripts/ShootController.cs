@@ -12,6 +12,9 @@ public class ShootController : MonoBehaviour
     GameObject debugSphere;
     [SerializeField] bool debugMode, drawPlayerRayImpactPoint, drawPlayerRay;
     [SerializeField] float debugSphereRadius = 0.2f;
+
+
+     [SerializeField] float damage;
     void Awake()
     {
         camera = gameObject.GetComponentInChildren<Camera>().gameObject;
@@ -19,6 +22,9 @@ public class ShootController : MonoBehaviour
         {
             debugSphere = Instantiate(debugSpherePrefab);
         }
+
+        Weapons weapons = gameObject.GetComponent<Weapons>();
+        
     }
 
     // Update is called once per frame
@@ -43,17 +49,17 @@ public class ShootController : MonoBehaviour
         if (hit.collider != null)
         {
             debugSphereCenter = hit.point;
-            if (Input.GetMouseButtonDown(0) && hit.collider.CompareTag("enemy"))
+            if (Input.GetMouseButtonDown(0))
             {
-                int damage = 2;
-                object[] values = new object[1];
-                values[0] = damage;
-
-                hit.collider.transform.gameObject.SendMessage("RecieveDamage", values);
-
                 LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
                 line.SetPosition(0, camera.transform.position);
                 line.SetPosition(1, hit.point);
+
+                if(hit.collider.CompareTag("enemy"))
+                {
+                    hit.collider.transform.gameObject.SendMessage("RecieveDamage", damage);
+                    gameObject.SendMessage("IncreaseRecoilDebt",  SendMessageOptions.DontRequireReceiver);
+                }
             }
         }
         else
