@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ShootController : MonoBehaviour
 {
@@ -12,9 +15,8 @@ public class ShootController : MonoBehaviour
     GameObject debugSphere;
     [SerializeField] bool debugMode, drawPlayerRayImpactPoint, drawPlayerRay;
     [SerializeField] float debugSphereRadius = 0.2f;
-
-
-     [SerializeField] float damage;
+    [SerializeField] float damage;
+    Weapon currentWeapon;
     void Awake()
     {
         camera = gameObject.GetComponentInChildren<Camera>().gameObject;
@@ -22,15 +24,42 @@ public class ShootController : MonoBehaviour
         {
             debugSphere = Instantiate(debugSpherePrefab);
         }
-
-        Weapons weapons = gameObject.GetComponent<Weapons>();
-        
+        currentWeapon = gameObject.AddComponent<Weapon>();
+        currentWeapon.SetInitialValues(1, 0.2f, 5, 10, true);
     }
 
     // Update is called once per frame
     void Update()
     {
         ProducePlayerRay();
+        PlayerFireLogic();
+        currentWeapon.DecrementCooldown();
+    }
+
+    private void PlayerFireLogic()
+    {
+        if(Input.GetMouseButtonDown(0))
+        {
+            Physics.Raycast(
+                camera.transform.position,
+                camera.transform.forward,
+                out RaycastHit hit
+            );
+            currentWeapon.Fire(hit);
+
+            LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
+            line.SetPosition(0, camera.transform.position);
+
+            if(hit.collider == null)
+            {
+                line.SetPosition(1, camera.transform.position + 500 * camera.transform.forward);
+            }
+            else
+            {
+                debugSphereCenter = hit.point;
+                line.SetPosition(1, hit.point);
+            }
+        }
     }
 
     private void ProducePlayerRay()
@@ -40,28 +69,6 @@ public class ShootController : MonoBehaviour
             Debug.DrawLine(camera.transform.position, camera.transform.position + 500 * camera.transform.forward);
         }
 
-        Physics.Raycast(
-            camera.transform.position,
-            camera.transform.forward,
-            out RaycastHit hit
-        );
-
-        if (hit.collider != null)
-        {
-            debugSphereCenter = hit.point;
-            if (Input.GetMouseButtonDown(0))
-            {
-                LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
-                line.SetPosition(0, camera.transform.position);
-                line.SetPosition(1, hit.point);
-
-                if(hit.collider.CompareTag("enemy"))
-                {
-                    hit.collider.transform.gameObject.SendMessage("RecieveDamage", damage);
-                    gameObject.SendMessage("IncreaseRecoilDebt",  SendMessageOptions.DontRequireReceiver);
-                }
-            }
-        }
         else
         {
             debugSphereCenter = null;

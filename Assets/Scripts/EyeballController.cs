@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,7 +10,7 @@ public class EyeBallController : MonoBehaviour
     GameObject headCamera;
     [SerializeField] Vector2 sensitivity = new(5, 5);
     [SerializeField] float pitchLimit = 80;
-    float recoilDebt = 0;
+    float recoilDebt = 0, recoveredRecoilDebt = 0;
     float cameraRotationX = 0;
 
 
@@ -31,19 +32,33 @@ public class EyeBallController : MonoBehaviour
 
         cameraRotationX += degreesX;
         cameraRotationX = Math.Clamp(cameraRotationX, -pitchLimit, pitchLimit);
+
         headCamera.transform.localEulerAngles = new(-cameraRotationX, 0, 0);
     }
 
     void Update()
     {
-        
+        HandleRecoilDebt();
+    }
+
+    private void HandleRecoilDebt()
+    {
+        if(recoilDebt > 0)
+        {
+            float degreesXIncrease = Mathf.Lerp(0, recoilDebt, 0.5f);
+            recoilDebt -= degreesXIncrease;
+            recoveredRecoilDebt += degreesXIncrease;
+            cameraRotationX += degreesXIncrease;
+            headCamera.transform.localEulerAngles = new(-cameraRotationX, 0, 0);
+        }
     }
 
     public void IncreaseRecoilDebt(object value)
     {
         try
         {
-            recoilDebt += (int)value;
+            recoilDebt += (float)value;
+            print("Recoil Debt: " + recoilDebt);
         }
         catch(Exception e)
         {
