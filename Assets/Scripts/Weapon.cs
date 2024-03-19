@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Weapon : MonoBehaviour
 {
     public int Damage { get; set; }
@@ -39,6 +40,7 @@ public class Weapon : MonoBehaviour
 
             if(hit.collider != null && hit.collider.CompareTag("enemy"))
             {
+
                 hit.collider.transform.gameObject.SendMessage("RecieveDamage", Damage);
             }
         }

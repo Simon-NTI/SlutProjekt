@@ -45,10 +45,15 @@ public class EyeBallController : MonoBehaviour
     {
         if(recoilDebt > 0)
         {
-            float degreesXIncrease = Mathf.Lerp(0, recoilDebt, 0.5f);
+            float degreesXIncrease = Mathf.Lerp(0, recoilDebt, 0.2f);
             recoilDebt -= degreesXIncrease;
             recoveredRecoilDebt += degreesXIncrease;
             cameraRotationX += degreesXIncrease;
+            
+            float degreesXDecrease = -Mathf.Lerp(0, recoveredRecoilDebt, 0.1f);
+            cameraRotationX += degreesXDecrease;
+            recoveredRecoilDebt += degreesXDecrease;
+
             headCamera.transform.localEulerAngles = new(-cameraRotationX, 0, 0);
         }
     }

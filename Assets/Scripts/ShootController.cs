@@ -16,6 +16,7 @@ public class ShootController : MonoBehaviour
     [SerializeField] bool debugMode, drawPlayerRayImpactPoint, drawPlayerRay;
     [SerializeField] float debugSphereRadius = 0.2f;
     [SerializeField] float damage;
+    [SerializeField] ParticleSystem impactParticles;
     Weapon currentWeapon;
     void Awake()
     {
@@ -25,7 +26,7 @@ public class ShootController : MonoBehaviour
             debugSphere = Instantiate(debugSpherePrefab);
         }
         currentWeapon = gameObject.AddComponent<Weapon>();
-        currentWeapon.SetInitialValues(1, 0.2f, 5, 10, true);
+        currentWeapon.SetInitialValues(1, 0.2f, 15, 10, true);
     }
 
     // Update is called once per frame
@@ -47,17 +48,26 @@ public class ShootController : MonoBehaviour
             );
             currentWeapon.Fire(hit);
 
-            LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
-            line.SetPosition(0, camera.transform.position);
+            //LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
+            //line.SetPosition(0, camera.transform.position);
 
             if(hit.collider == null)
             {
-                line.SetPosition(1, camera.transform.position + 500 * camera.transform.forward);
+                //line.SetPosition(1, camera.transform.position + 500 * camera.transform.forward);
             }
             else
             {
                 debugSphereCenter = hit.point;
-                line.SetPosition(1, hit.point);
+                //line.SetPosition(1, hit.point);
+
+                LineRenderer debugLine = Instantiate(gunRay).GetComponent<LineRenderer>();
+                //line.SetPosition(0, hit.point);
+                //line.SetPosition(1, hit.point += hit.normal * 50);
+
+                Quaternion quaternion = Quaternion.Euler(hit.normal);
+                //print("Normal: " + hit.normal);
+                print("Quaternion: " + quaternion);
+                Instantiate(impactParticles, hit.point, quaternion);
             }
         }
     }
