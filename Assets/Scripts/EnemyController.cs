@@ -39,7 +39,7 @@ public class EnemyController : MonoBehaviour
             if(health <= 0)
             {
                 Destroy(gameObject);
-                if(targetObject.CompareTag("player"))
+                if(targetObject.CompareTag("Player"))
                 {
                     targetObject.SendMessage("RecieveCash", cashValue);
                 }

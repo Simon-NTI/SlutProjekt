@@ -26,7 +26,7 @@ public class ShootController : MonoBehaviour
             debugSphere = Instantiate(debugSpherePrefab);
         }
         currentWeapon = gameObject.AddComponent<Weapon>();
-        currentWeapon.SetInitialValues(1, 0.2f, 15, 10, true);
+        currentWeapon.SetInitialValues(4, 0.2f, 15, 10, true);
     }
 
     // Update is called once per frame
@@ -58,16 +58,10 @@ public class ShootController : MonoBehaviour
             else
             {
                 debugSphereCenter = hit.point;
-                //line.SetPosition(1, hit.point);
 
-                LineRenderer debugLine = Instantiate(gunRay).GetComponent<LineRenderer>();
-                //line.SetPosition(0, hit.point);
-                //line.SetPosition(1, hit.point += hit.normal * 50);
-
-                Quaternion quaternion = Quaternion.Euler(hit.normal);
-                //print("Normal: " + hit.normal);
-                print("Quaternion: " + quaternion);
-                Instantiate(impactParticles, hit.point, quaternion);
+                // Instantiate a particle system where the player's shot impacts and gives it
+                // the rotation equal to the normal of the surface hit
+                Instantiate(impactParticles, hit.point, Quaternion.LookRotation(hit.normal));
             }
         }
     }

@@ -43,6 +43,7 @@ public class EyeBallController : MonoBehaviour
 
     private void HandleRecoilDebt()
     {
+        gameObject.SendMessage("UpdateCrosshair", recoveredRecoilDebt, SendMessageOptions.DontRequireReceiver);
         if(recoilDebt > 0)
         {
             float degreesXIncrease = Mathf.Lerp(0, recoilDebt, 0.2f);
