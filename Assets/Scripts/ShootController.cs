@@ -17,7 +17,7 @@ public class ShootController : MonoBehaviour
     [SerializeField] float debugSphereRadius = 0.2f;
     [SerializeField] float damage;
     [SerializeField] ParticleSystem impactParticles;
-    Weapon currentWeapon;
+    Weapon weapon;
     void Awake()
     {
         camera = gameObject.GetComponentInChildren<Camera>().gameObject;
@@ -25,8 +25,8 @@ public class ShootController : MonoBehaviour
         {
             debugSphere = Instantiate(debugSpherePrefab);
         }
-        currentWeapon = gameObject.AddComponent<Weapon>();
-        currentWeapon.SetInitialValues(4, 0.2f, 15, 10, true);
+        weapon = gameObject.AddComponent<Weapon>();
+        weapon.SetValues(4, 0.2f, 15, 10, true);
     }
 
     // Update is called once per frame
@@ -34,34 +34,36 @@ public class ShootController : MonoBehaviour
     {
         ProducePlayerRay();
         PlayerFireLogic();
-        currentWeapon.DecrementCooldown();
+        weapon.DecrementCooldown();
     }
 
     private void PlayerFireLogic()
     {
-        if(Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButton(0))
         {
             Physics.Raycast(
                 camera.transform.position,
                 camera.transform.forward,
                 out RaycastHit hit
             );
-            currentWeapon.Fire(hit);
-
-            //LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
-            //line.SetPosition(0, camera.transform.position);
-
-            if(hit.collider == null)
+            
+            if(weapon.Fire(hit))
             {
-                //line.SetPosition(1, camera.transform.position + 500 * camera.transform.forward);
-            }
-            else
-            {
-                debugSphereCenter = hit.point;
+                //LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
+                //line.SetPosition(0, camera.transform.position);
 
-                // Instantiate a particle system where the player's shot impacts and gives it
-                // the rotation equal to the normal of the surface hit
-                Instantiate(impactParticles, hit.point, Quaternion.LookRotation(hit.normal));
+                if(hit.collider == null)
+                {
+                    //line.SetPosition(1, camera.transform.position + 500 * camera.transform.forward);
+                }
+                else
+                {
+                    debugSphereCenter = hit.point;
+
+                    // Instantiate a particle system where the player's shot impacts and gives it
+                    // the rotation equal to the normal of the surface hit
+                    Instantiate(impactParticles, hit.point, Quaternion.LookRotation(hit.normal));
+                }
             }
         }
     }
@@ -72,7 +74,6 @@ public class ShootController : MonoBehaviour
         {
             Debug.DrawLine(camera.transform.position, camera.transform.position + 500 * camera.transform.forward);
         }
-
         else
         {
             debugSphereCenter = null;

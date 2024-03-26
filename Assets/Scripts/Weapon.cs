@@ -5,13 +5,13 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    public int Damage { get; set; }
+    private int damage;
     public float fireDelay, currentFireCooldown, recoil, damageFalloffPerUnit;
-    public bool automaticFire;
-
-    public void SetInitialValues(int damage, float fireDelay, float recoil, float damageFalloffPerUnit, bool automaticFire)
+    private bool automaticFire;
+    private bool releasedSinceLastFire = true;
+    public void SetValues(int damage, float fireDelay, float recoil, float damageFalloffPerUnit, bool automaticFire)
     {
-        Damage = damage;
+        this.damage = damage;
         this.fireDelay = fireDelay;
         currentFireCooldown = fireDelay;
         this.recoil = recoil;
@@ -19,30 +19,35 @@ public class Weapon : MonoBehaviour
         this.automaticFire = automaticFire;
     }
 
-    public void DecrementCooldown()
+    public void Update()
     {
-        currentFireCooldown -= Time.deltaTime;
+        releasedSinceLastFire = !Input.GetMouseButton(0);
     }
 
-    public void Fire(RaycastHit hit)
+    public void DecrementCooldown()
     {
-        if(currentFireCooldown < fireDelay)
+        currentFireCooldown += Time.deltaTime;
+        currentFireCooldown = Mathf.Clamp(currentFireCooldown, 0, fireDelay);
+    }
+
+    public bool Fire(RaycastHit hit)
+    {
+        if(currentFireCooldown >= fireDelay && (releasedSinceLastFire || automaticFire))
         {
             gameObject.SendMessage("IncreaseRecoilDebt", recoil, SendMessageOptions.DontRequireReceiver);
-            currentFireCooldown += fireDelay;
-            
-            try
-            {
-                print("Distance to hit: " + hit.distance);
-            }
-            catch
-            {}
+            currentFireCooldown -= fireDelay;
 
             if(hit.collider != null && hit.collider.CompareTag("enemy"))
             {
-
-                hit.collider.transform.gameObject.SendMessage("RecieveDamage", Damage);
+                int calculatedDamage = damage;
+                hit.collider.transform.gameObject.SendMessage("RecieveDamage", calculatedDamage);
             }
+
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 }

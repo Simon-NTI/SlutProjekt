@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 public class EyeBallController : MonoBehaviour
 {
+    [SerializeField] GameObject PlayerUI;
     GameObject headCamera;
     [SerializeField] Vector2 sensitivity = new(5, 5);
     [SerializeField] float pitchLimit = 80;
@@ -43,7 +44,7 @@ public class EyeBallController : MonoBehaviour
 
     private void HandleRecoilDebt()
     {
-        gameObject.SendMessage("UpdateCrosshair", recoveredRecoilDebt, SendMessageOptions.DontRequireReceiver);
+        PlayerUI.SendMessage("UpdateCrosshair", recoveredRecoilDebt);
         if(recoilDebt > 0)
         {
             float degreesXIncrease = Mathf.Lerp(0, recoilDebt, 0.2f);
