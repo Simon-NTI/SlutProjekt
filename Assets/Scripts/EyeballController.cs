@@ -47,12 +47,13 @@ public class EyeBallController : MonoBehaviour
         PlayerUI.SendMessage("UpdateCrosshair", recoveredRecoilDebt);
         if(recoilDebt > 0)
         {
+            // TODO This does not account for deltatime, but should
             float degreesXIncrease = Mathf.Lerp(0, recoilDebt, 0.2f);
             recoilDebt -= degreesXIncrease;
             recoveredRecoilDebt += degreesXIncrease;
             cameraRotationX += degreesXIncrease;
             
-            float degreesXDecrease = -Mathf.Lerp(0, recoveredRecoilDebt, 0.1f);
+            float degreesXDecrease = -Mathf.Lerp(0, recoveredRecoilDebt, 0.05f);
             cameraRotationX += degreesXDecrease;
             recoveredRecoilDebt += degreesXDecrease;
 

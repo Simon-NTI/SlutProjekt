@@ -1,9 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] GameObject PlayerUI;
+    int money = 0;
     [SerializeField] int health = 100;
     // Start is called before the first frame update
     void Start()
@@ -24,6 +28,17 @@ public class PlayerController : MonoBehaviour
 
     private void RecieveCash(object value)
     {
-        print(value);
+        try
+        {
+            money += (int)value;
+        }
+        catch(Exception e)
+        {
+            print("Failed to cast money value\n" + e.Message);
+        }
+        finally
+        {
+            PlayerUI.SendMessage("UpdateMoneyCounter", money);
+        }
     }
 }
