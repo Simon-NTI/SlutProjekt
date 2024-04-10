@@ -25,6 +25,11 @@ public class EyeBallController : MonoBehaviour
 
     void OnLook(InputValue value)
     {
+        if(Time.timeScale == 0)
+        {
+            return;
+        }
+
         Vector2 lookVector = value.Get<Vector2>();
 
         float degreesY = lookVector.x * sensitivity.x;
@@ -42,9 +47,17 @@ public class EyeBallController : MonoBehaviour
         HandleRecoilDebt();
     }
 
+    /// <summary>
+    /// Called each frame
+    /// Performs recoil related logic
+    /// </summary>
     private void HandleRecoilDebt()
     {
-        PlayerUI.SendMessage("UpdateCrosshair", recoveredRecoilDebt);
+        if(Time.timeScale == 0)
+        {
+            return;
+        }
+        
         if(recoilDebt > 0)
         {
             // TODO This does not account for deltatime, but should
@@ -59,6 +72,7 @@ public class EyeBallController : MonoBehaviour
 
             headCamera.transform.localEulerAngles = new(-cameraRotationX, 0, 0);
         }
+        PlayerUI.SendMessage("UpdateCrosshair", recoveredRecoilDebt);
     }
 
     public void IncreaseRecoilDebt(object value)

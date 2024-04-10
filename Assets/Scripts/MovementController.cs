@@ -20,10 +20,9 @@ public class MovementController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
     }
 
-
     void Update()
     {
-
+        // Calculate movement
         Vector3 movement = transform.right * inputVector.x
         + transform.forward * inputVector.y;
         movement *= speed;
@@ -37,6 +36,7 @@ public class MovementController : MonoBehaviour
             }
         }
 
+        // Calulcate gravity
         velocityY += Physics.gravity.y * gravityMultiplier * Time.deltaTime;
         movement.y = velocityY;
 

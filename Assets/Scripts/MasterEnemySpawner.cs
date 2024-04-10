@@ -13,28 +13,30 @@ public class MasterEnemySpawner : MonoBehaviour
     void Awake()
     {
         currentCooldown = spawnInterval;
-        try
+        
+        // Grab the position of all child objects
+        for (int i = 0; i < gameObject.transform.childCount; i++)
         {
-            for (int i = 0; i < gameObject.transform.childCount; i++)
+            try
             {
-                print($"Position of child at index {i}: {gameObject.transform.GetChild(i).position}");
                 spawnPositions.Add(gameObject.transform.GetChild(i).position);
             }
-            print("Spawnposition count:" + spawnPositions.Count);
-        }
-        catch(Exception e)
-        {
-            print("Failed to get position of child\n" + e.Message);
+            catch(Exception e)
+            {
+                print($"Failed to get position of child No {i}\n" + e.Message);
+            }
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        //print(currentCooldown);
         CheckSpawnConditions();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void CheckSpawnConditions()
     {
         currentCooldown -= Time.deltaTime;

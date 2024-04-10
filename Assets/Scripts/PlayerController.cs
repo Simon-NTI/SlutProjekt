@@ -7,15 +7,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] GameObject PlayerUI;
-    int money = 0;
+    public int money = 0;
     [SerializeField] int health = 100;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
     void Update()
     {
         

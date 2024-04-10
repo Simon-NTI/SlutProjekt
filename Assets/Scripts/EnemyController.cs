@@ -22,11 +22,16 @@ public class EnemyController : MonoBehaviour
         UpdateAgentDestination();
     }
 
+    /// <summary>
+    /// Subtracts the given value from the health of this enemy, then check if the enemy has died
+    /// </summary>
+    /// <param name="value">
+    /// The damage to apply
+    /// </param>
     private void RecieveDamage(object value)
     {
         try
         {
-            //print(values[0]);
             health -= (int)value;
         }
         catch(Exception e)
@@ -61,6 +66,13 @@ public class EnemyController : MonoBehaviour
 
     private void SetAgentTarget(object value)
     {
-        targetObject = (GameObject) value;
+        try
+        {
+            targetObject = (GameObject) value;
+        }
+        catch(Exception e)
+        {
+            print("This target was not a GameObject\n" + e.Message);
+        }
     }
 }

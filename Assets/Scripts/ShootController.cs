@@ -39,6 +39,11 @@ public class ShootController : MonoBehaviour
 
     private void PlayerFireLogic()
     {
+        if(Time.timeScale == 0)
+        {
+            return;
+        }
+        
         if(Input.GetMouseButton(0))
         {
             Physics.Raycast(
