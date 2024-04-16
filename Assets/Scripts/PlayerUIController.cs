@@ -1,5 +1,8 @@
 using System;
+using System.Text.RegularExpressions;
 using TMPro;
+using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
 using UnityEngine.UI;
@@ -11,14 +14,24 @@ public class PlayerUIController : MonoBehaviour
     (RectTransform left, RectTransform right, RectTransform upper, RectTransform lower) crosshair;
     GameObject shop;
 
+    (string name, int damage, float fireDelay, float recoil, bool automaticFire, int price, bool bought)[] shopItems
+    = new (string name, int damage, float fireDelay, float recoil, bool automaticFire, int price, bool bought)[4] 
+    {
+        ("Pistol", 3, 0.65f, 10, false, 100, true), 
+        ("SMG", 2, 0.3f, 6, true, 150, false), 
+        ("Sniper", 5, 1f, 20, false, 350, false), 
+        ("Assault_Rifle", 4, 0.5f, 10, true, 600, false)
+    };
+
     PlayerController playerController;
-    //(Button pistol, Button smg, Button assaultRifle) shopButtons;
 
     void Awake()
     {
         playerController = transform.GetComponentInParent<PlayerController>();
 
         shop = transform.Find("Shop").gameObject;
+        //Button button = shop.transform.Find("BuyPistol").gameObject.GetComponent<Button>();
+
         Transform crosshairObject = transform.Find("Crosshair").gameObject.transform;
 
         crosshair.left = crosshairObject.Find("Left").gameObject.GetComponent<RectTransform>();
@@ -31,10 +44,50 @@ public class PlayerUIController : MonoBehaviour
         //shopButtons.pistol = shop.transform.Find("BuyPistol").gameObject.GetComponent<Button>();
     }
 
+    private void Start() {
+        InitiateShop();
+    }
+
     // Update is called once per frame
     void Update()
     {
         UpdateShopState();
+    }
+
+    private void InitiateShop()
+    {
+        for (int i = 0; i < shopItems.Length; i++)
+        {
+            string recoilRating;
+            if (shopItems[i].recoil < 10)
+            {
+                recoilRating = "Low";
+            }
+            else if(shopItems[i].recoil > 19)
+            {
+                recoilRating = "High";
+            }
+            else
+            {
+                recoilRating = "Medium";
+            }
+
+            Transform button = shop.transform.Find("Buy" + Regex.Replace(shopItems[i].name, "_", ""));
+            if(button == null)
+            {
+                print($"Could not find corresponding button for weapon {shopItems[i].name}");
+                continue;
+            }
+
+            button.gameObject.SetActive(true);
+            button.Find("ButtonText").GetComponent<TextMeshProUGUI>().text = "Buy " + shopItems[i].name;
+            button.Find("Description").GetComponent<TextMeshProUGUI>().text =
+                $"{Regex.Replace(shopItems[i].name, "\\s", " ")}:\n"
+                + $"Damage: {shopItems[i].damage}\n"
+                + $"Fire-rate: {Math.Round(1f / shopItems[i].fireDelay, 1)}\n"
+                + $"Recoil: {recoilRating}\n"
+                + $"Price: {shopItems[0].price}";
+        }
     }
 
     private void UpdateShopState()
@@ -70,10 +123,7 @@ public class PlayerUIController : MonoBehaviour
         }
     }
 
-    private void UpdateMoneyCounter(object value)
-    {
-        moneyCounter.text = $"$$$: {value}";
-    }
+    private void UpdateMoneyCounter(object value) => moneyCounter.text = $"$$$: {value}";
 
     /// <summary>
     /// Produces an offset on each crosshair arm

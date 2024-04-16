@@ -26,7 +26,7 @@ public class ShootController : MonoBehaviour
             debugSphere = Instantiate(debugSpherePrefab);
         }
         weapon = gameObject.AddComponent<Weapon>();
-        weapon.SetValues(4, 0.2f, 12, 10, true);
+        weapon.SetValues(4, 0.2f, 12, false);
     }
 
     // Update is called once per frame

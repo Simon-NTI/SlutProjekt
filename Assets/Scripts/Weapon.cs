@@ -6,16 +6,15 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     private int damage;
-    public float fireDelay, currentFireCooldown, recoil, damageFalloffPerUnit;
+    public float fireDelay, currentFireCooldown, recoil;
     private bool automaticFire;
     private bool releasedSinceLastFire = true;
-    public void SetValues(int damage, float fireDelay, float recoil, float damageFalloffPerUnit, bool automaticFire)
+    public void SetValues(int damage, float fireDelay, float recoil, bool automaticFire)
     {
         this.damage = damage;
         this.fireDelay = fireDelay;
         currentFireCooldown = fireDelay;
         this.recoil = recoil;
-        this.damageFalloffPerUnit = damageFalloffPerUnit;
         this.automaticFire = automaticFire;
     }
 
