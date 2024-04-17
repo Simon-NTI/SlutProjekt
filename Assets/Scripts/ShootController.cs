@@ -15,7 +15,6 @@ public class ShootController : MonoBehaviour
     GameObject debugSphere;
     [SerializeField] bool debugMode, drawPlayerRayImpactPoint, drawPlayerRay;
     [SerializeField] float debugSphereRadius = 0.2f;
-    [SerializeField] float damage;
     [SerializeField] ParticleSystem impactParticles;
     Weapon weapon;
     void Awake()
@@ -26,7 +25,7 @@ public class ShootController : MonoBehaviour
             debugSphere = Instantiate(debugSpherePrefab);
         }
         weapon = gameObject.AddComponent<Weapon>();
-        weapon.SetValues(4, 0.2f, 12, false);
+        weapon.SetValues(Weapon.pistol);
     }
 
     // Update is called once per frame
@@ -54,19 +53,18 @@ public class ShootController : MonoBehaviour
             
             if(weapon.Fire(hit))
             {
-                //LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
-                //line.SetPosition(0, camera.transform.position);
+                LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
+                line.SetPosition(0, camera.transform.position);
 
                 if(hit.collider == null)
                 {
-                    //line.SetPosition(1, camera.transform.position + 500 * camera.transform.forward);
+                    line.SetPosition(1, camera.transform.position + 500 * camera.transform.forward);
                 }
                 else
                 {
                     debugSphereCenter = hit.point;
-
-                    // Instantiate a particle system where the player's shot impacts and gives it
-                    // the rotation equal to the normal of the surface hit
+                    // Instantiate a particle system where the player's shot impacts and point
+                    // it in the same direction as the normal of the surface hit
                     Instantiate(impactParticles, hit.point, Quaternion.LookRotation(hit.normal));
                 }
             }
@@ -91,5 +89,10 @@ public class ShootController : MonoBehaviour
                 debugSphere.transform.position = (Vector3)debugSphereCenter;
             }
         }
+    }
+
+    private void EquipWeapon(WeaponMetadata weaponMetadata)
+    {
+        weapon.SetValues(weaponMetadata);
     }
 }

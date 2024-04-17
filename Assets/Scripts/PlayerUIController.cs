@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
 using Unity.VisualScripting;
@@ -9,25 +10,17 @@ using UnityEngine.UI;
 
 public class PlayerUIController : MonoBehaviour
 {
-    [SerializeField] short baseOffset = 10;
+    [SerializeField] short crossHairBaseOffset = 10;
     TextMeshProUGUI moneyCounter;
     (RectTransform left, RectTransform right, RectTransform upper, RectTransform lower) crosshair;
     GameObject shop;
-
-    (string name, int damage, float fireDelay, float recoil, bool automaticFire, int price, bool bought)[] shopItems
-    = new (string name, int damage, float fireDelay, float recoil, bool automaticFire, int price, bool bought)[4] 
-    {
-        ("Pistol", 3, 0.65f, 10, false, 100, true), 
-        ("SMG", 2, 0.3f, 6, true, 150, false), 
-        ("Sniper", 5, 1f, 20, false, 350, false), 
-        ("Assault_Rifle", 4, 0.5f, 10, true, 600, false)
-    };
-
     PlayerController playerController;
+    ShootController shootController;
 
     void Awake()
     {
         playerController = transform.GetComponentInParent<PlayerController>();
+        shootController = transform.GetComponentInParent<ShootController>();
 
         shop = transform.Find("Shop").gameObject;
         //Button button = shop.transform.Find("BuyPistol").gameObject.GetComponent<Button>();
@@ -44,7 +37,8 @@ public class PlayerUIController : MonoBehaviour
         //shopButtons.pistol = shop.transform.Find("BuyPistol").gameObject.GetComponent<Button>();
     }
 
-    private void Start() {
+    private void Start() 
+    {
         InitiateShop();
     }
 
@@ -56,14 +50,14 @@ public class PlayerUIController : MonoBehaviour
 
     private void InitiateShop()
     {
-        for (int i = 0; i < shopItems.Length; i++)
+        for (int i = 0; i < Weapon.weapons.Length; i++)
         {
             string recoilRating;
-            if (shopItems[i].recoil < 10)
+            if (Weapon.weapons[i].recoil < 10)
             {
                 recoilRating = "Low";
             }
-            else if(shopItems[i].recoil > 19)
+            else if(Weapon.weapons[i].recoil > 19)
             {
                 recoilRating = "High";
             }
@@ -72,21 +66,21 @@ public class PlayerUIController : MonoBehaviour
                 recoilRating = "Medium";
             }
 
-            Transform button = shop.transform.Find("Buy" + Regex.Replace(shopItems[i].name, "_", ""));
+            Transform button = shop.transform.Find("Buy" + Weapon.weapons[i].name.Replace("_", ""));
             if(button == null)
             {
-                print($"Could not find corresponding button for weapon {shopItems[i].name}");
+                print($"Could not find corresponding button for weapon {Weapon.weapons[i].name}");
                 continue;
             }
 
             button.gameObject.SetActive(true);
-            button.Find("ButtonText").GetComponent<TextMeshProUGUI>().text = "Buy " + shopItems[i].name;
+            button.Find("ButtonText").GetComponent<TextMeshProUGUI>().text = "Buy " + Weapon.weapons[i].name;
             button.Find("Description").GetComponent<TextMeshProUGUI>().text =
-                $"{Regex.Replace(shopItems[i].name, "\\s", " ")}:\n"
-                + $"Damage: {shopItems[i].damage}\n"
-                + $"Fire-rate: {Math.Round(1f / shopItems[i].fireDelay, 1)}\n"
+                $"{Weapon.weapons[i].name.Replace("_", "")}:\n"
+                + $"Damage: {Weapon.weapons[i].damage}\n"
+                + $"Fire-rate: {Math.Round(1f / Weapon.weapons[i].fireDelay, 1)}\n"
                 + $"Recoil: {recoilRating}\n"
-                + $"Price: {shopItems[0].price}";
+                + $"Price: {Weapon.weapons[i].price}";
         }
     }
 
@@ -111,27 +105,33 @@ public class PlayerUIController : MonoBehaviour
         }
     }
 
-    public void BuyPistol()
+
+    private void BuyWeapon(WeaponMetadata weapon)
     {
-        if(playerController.money >= 50)
+        if(playerController.money >= weapon.price && !weapon.bought)
         {
-            print("You can afford the pistol :D");
+            playerController.money -= weapon.price;
+            weapon.bought = true;
+        }
+        else if(weapon.bought)
+        {
+            shootController.SendMessage("EquipWeapon", weapon);
         }
         else
         {
-            print("You can not afford the pistol :(");
+            print($"You can not afford the {weapon.name} :(");
         }
     }
+    public void BuyPistol() => BuyWeapon(Weapon.pistol);
+    public void BuySMG() => BuyWeapon(Weapon.smg);
+    public void BuySniper() => BuyWeapon(Weapon.sniper);
+    public void BuyAssaultRifle() => BuyWeapon(Weapon.assaultRifle);
 
     private void UpdateMoneyCounter(object value) => moneyCounter.text = $"$$$: {value}";
 
     /// <summary>
     /// Produces an offset on each crosshair arm
     /// </summary>
-    /// <param name="_value"></param> <summary>
-    /// 
-    /// </summary>
-    /// <param name="_value"></param>
     private void UpdateCrosshair(object _value)
     {
         float offsetValue = 0;
@@ -145,26 +145,26 @@ public class PlayerUIController : MonoBehaviour
         }
 
         crosshair.left.localPosition = new(
-            -baseOffset - offsetValue, 
+            -crossHairBaseOffset - offsetValue, 
             crosshair.left.localPosition.y, 
             crosshair.left.localPosition.z
             );
 
         crosshair.right.localPosition = new(
-            baseOffset + offsetValue, 
+            crossHairBaseOffset + offsetValue, 
             crosshair.right.localPosition.y, 
             crosshair.right.localPosition.z
             );
 
         crosshair.upper.localPosition = new(
             crosshair.upper.localPosition.x, 
-            baseOffset + offsetValue, 
+            crossHairBaseOffset + offsetValue, 
             crosshair.upper.localPosition.z
             );
 
         crosshair.lower.localPosition = new(
             crosshair.lower.localPosition.x, 
-            -baseOffset - offsetValue, 
+            -crossHairBaseOffset - offsetValue, 
             crosshair.lower.localPosition.z
             );
     }

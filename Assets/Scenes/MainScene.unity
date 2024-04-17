@@ -759,7 +759,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 547285075}
         m_TargetAssemblyTypeName: PlayerUIController, Assembly-CSharp
-        m_MethodName: BuyPistol
+        m_MethodName: BuySMG
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1818,7 +1818,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 547285075}
         m_TargetAssemblyTypeName: PlayerUIController, Assembly-CSharp
-        m_MethodName: BuyPistol
+        m_MethodName: BuyAssaultRifle
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2117,7 +2117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aecada308d68084e81b23d15e118e7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseOffset: 10
+  crossHairBaseOffset: 10
 --- !u!43 &608081421
 Mesh:
   m_ObjectHideFlags: 0
@@ -19934,7 +19934,6 @@ MonoBehaviour:
   drawPlayerRayImpactPoint: 1
   drawPlayerRay: 1
   debugSphereRadius: 0.1
-  damage: 0
   impactParticles: {fileID: 7735745298858766827, guid: 73b7def14b4e3434fbb2a071466c6591, type: 3}
 --- !u!114 &1843406940
 MonoBehaviour:
@@ -24825,7 +24824,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 547285075}
         m_TargetAssemblyTypeName: PlayerUIController, Assembly-CSharp
-        m_MethodName: BuyPistol
+        m_MethodName: BuySniper
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
