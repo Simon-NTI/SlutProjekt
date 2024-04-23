@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class WeaponMetadata : MonoBehaviour
 {
-    public string name;
-    public int damage, price;
-    public float fireDelay, recoil;
-    public bool automaticFire;
+    public readonly string name;
+    public readonly int damage, price;
+    public readonly float fireDelay, recoil;
+    public readonly bool automaticFire;
     public bool bought;
 
     public WeaponMetadata(string name, int damage, int price, float fireDelay, float recoil, bool automaticFire, bool bought)

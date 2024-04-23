@@ -1,21 +1,19 @@
 using System;
-using System.Linq;
-using System.Text.RegularExpressions;
 using TMPro;
 using Unity.VisualScripting;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 using UnityEngine.UI;
 
 public class PlayerUIController : MonoBehaviour
 {
     [SerializeField] short crossHairBaseOffset = 10;
-    TextMeshProUGUI moneyCounter;
-    (RectTransform left, RectTransform right, RectTransform upper, RectTransform lower) crosshair;
-    GameObject shop;
-    PlayerController playerController;
-    ShootController shootController;
+    private TextMeshProUGUI moneyCounter;
+    private (RectTransform left, RectTransform right, RectTransform upper, RectTransform lower) crosshair;
+    private GameObject shop;
+    [SerializeField] GameObject shopItemTemplate;
+    [SerializeField] GameObject contentArea;
+    private PlayerController playerController;
+    private ShootController shootController;
 
     void Awake()
     {
@@ -23,7 +21,6 @@ public class PlayerUIController : MonoBehaviour
         shootController = transform.GetComponentInParent<ShootController>();
 
         shop = transform.Find("Shop").gameObject;
-        //Button button = shop.transform.Find("BuyPistol").gameObject.GetComponent<Button>();
 
         Transform crosshairObject = transform.Find("Crosshair").gameObject.transform;
 
@@ -33,8 +30,6 @@ public class PlayerUIController : MonoBehaviour
         crosshair.lower = crosshairObject.Find("Lower").gameObject.GetComponent<RectTransform>();
 
         moneyCounter = transform.Find("MoneyCounter").gameObject.GetComponent<TextMeshProUGUI>();
-
-        //shopButtons.pistol = shop.transform.Find("BuyPistol").gameObject.GetComponent<Button>();
     }
 
     private void Start() 
@@ -42,7 +37,6 @@ public class PlayerUIController : MonoBehaviour
         InitiateShop();
     }
 
-    // Update is called once per frame
     void Update()
     {
         UpdateShopState();
@@ -50,8 +44,23 @@ public class PlayerUIController : MonoBehaviour
 
     private void InitiateShop()
     {
-        for (int i = 0; i < Weapon.weapons.Length; i++)
+        int weaponCount = Weapon.weapons.Length;
+        for (int i = 0; i < weaponCount; i++)
         {
+            contentArea.GetComponent<RectTransform>().sizeDelta = new(
+                contentArea.GetComponent<RectTransform>().sizeDelta.x,
+                weaponCount * 250
+            );
+
+            Vector2 sizeDelta = contentArea.GetComponent<RectTransform>().sizeDelta;
+            GameObject shopItem = Instantiate(shopItemTemplate, contentArea.transform);
+
+
+            shopItem.GetComponent<RectTransform>().anchoredPosition = new(
+                sizeDelta.x,
+                sizeDelta.y / 2f - (sizeDelta.y / weaponCount * i + 150)
+            );
+
             string recoilRating;
             if (Weapon.weapons[i].recoil < 10)
             {
@@ -66,16 +75,10 @@ public class PlayerUIController : MonoBehaviour
                 recoilRating = "Medium";
             }
 
-            Transform button = shop.transform.Find("Buy" + Weapon.weapons[i].name.Replace("_", ""));
-            if(button == null)
-            {
-                print($"Could not find corresponding button for weapon {Weapon.weapons[i].name}");
-                continue;
-            }
+            Button button = shop.transform.GetComponent<Button>();
 
-            button.gameObject.SetActive(true);
-            button.Find("ButtonText").GetComponent<TextMeshProUGUI>().text = "Buy " + Weapon.weapons[i].name;
-            button.Find("Description").GetComponent<TextMeshProUGUI>().text =
+            shopItem.transform.Find("ButtonText").GetComponent<TextMeshProUGUI>().text = "Buy " + Weapon.weapons[i].name;
+            shopItem.transform.Find("Description").GetComponent<TextMeshProUGUI>().text =
                 $"{Weapon.weapons[i].name.Replace("_", "")}:\n"
                 + $"Damage: {Weapon.weapons[i].damage}\n"
                 + $"Fire-rate: {Math.Round(1f / Weapon.weapons[i].fireDelay, 1)}\n"
@@ -105,9 +108,9 @@ public class PlayerUIController : MonoBehaviour
         }
     }
 
-
-    private void BuyWeapon(WeaponMetadata weapon)
+    private void BuyWeapon(int buttonIndex)
     {
+        WeaponMetadata weapon = Weapon.weapons[buttonIndex];
         if(playerController.money >= weapon.price && !weapon.bought)
         {
             playerController.money -= weapon.price;
@@ -122,10 +125,7 @@ public class PlayerUIController : MonoBehaviour
             print($"You can not afford the {weapon.name} :(");
         }
     }
-    public void BuyPistol() => BuyWeapon(Weapon.pistol);
-    public void BuySMG() => BuyWeapon(Weapon.smg);
-    public void BuySniper() => BuyWeapon(Weapon.sniper);
-    public void BuyAssaultRifle() => BuyWeapon(Weapon.assaultRifle);
+
 
     private void UpdateMoneyCounter(object value) => moneyCounter.text = $"$$$: {value}";
 
