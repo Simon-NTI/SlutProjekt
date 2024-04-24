@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponMetadata : MonoBehaviour
+public class WeaponMetadata
 {
     public readonly string name;
     public readonly int damage, price;

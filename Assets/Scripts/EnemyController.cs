@@ -9,9 +9,8 @@ public class EnemyController : MonoBehaviour
 {
     NavMeshAgent agent;
     [SerializeField] GameObject targetObject;
-    [SerializeField] int health = 10;
-    [SerializeField] int damage = 8;
-    [SerializeField] int cashValue = 10;
+    int health = 10;
+    int cashValue = 20;
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();

@@ -2,6 +2,7 @@ using System;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class PlayerUIController : MonoBehaviour
@@ -10,6 +11,7 @@ public class PlayerUIController : MonoBehaviour
     private TextMeshProUGUI moneyCounter;
     private (RectTransform left, RectTransform right, RectTransform upper, RectTransform lower) crosshair;
     private GameObject shop;
+    private readonly TextMeshProUGUI[] shopItemLabels = new TextMeshProUGUI[Weapon.weapons.Length];
     [SerializeField] GameObject shopItemTemplate;
     [SerializeField] GameObject contentArea;
     private PlayerController playerController;
@@ -42,6 +44,14 @@ public class PlayerUIController : MonoBehaviour
         UpdateShopState();
     }
 
+    private void UpdateShopLabels()
+    {
+        for (int i = 0; i < shopItemLabels.Length; i++)
+        {
+            string shopAction = Weapon.weapons[i].bought ? "Equip " : "Buy ";
+            shopItemLabels[i].text = shopAction + Weapon.weapons[i].name.Replace("_", " ");
+        }
+    }
     private void InitiateShop()
     {
         int weaponCount = Weapon.weapons.Length;
@@ -75,15 +85,23 @@ public class PlayerUIController : MonoBehaviour
                 recoilRating = "Medium";
             }
 
-            Button button = shop.transform.GetComponent<Button>();
+            Button button = shopItem.transform.GetComponent<Button>();
 
-            shopItem.transform.Find("ButtonText").GetComponent<TextMeshProUGUI>().text = "Buy " + Weapon.weapons[i].name;
+            var i1 = i;
+            button.onClick.AddListener(() => BuyWeapon(i1));
+
+            string shopAction = Weapon.weapons[i].bought ? "Equip " : "Buy ";
+            TextMeshProUGUI shopItemLabel = shopItem.transform.Find("ButtonText").GetComponent<TextMeshProUGUI>();
+            shopItemLabel.text = shopAction + Weapon.weapons[i].name.Replace("_", " ");
+
             shopItem.transform.Find("Description").GetComponent<TextMeshProUGUI>().text =
-                $"{Weapon.weapons[i].name.Replace("_", "")}:\n"
+                $"{Weapon.weapons[i].name.Replace("_", " ")}:\n"
                 + $"Damage: {Weapon.weapons[i].damage}\n"
                 + $"Fire-rate: {Math.Round(1f / Weapon.weapons[i].fireDelay, 1)}\n"
                 + $"Recoil: {recoilRating}\n"
                 + $"Price: {Weapon.weapons[i].price}";
+
+            shopItemLabels[i] = shopItemLabel;
         }
     }
 
@@ -100,6 +118,7 @@ public class PlayerUIController : MonoBehaviour
             }
             else
             {
+                UpdateShopLabels();
                 Time.timeScale = 0;
                 shop.SetActive(true);
                 Cursor.lockState = CursorLockMode.None;
@@ -110,11 +129,14 @@ public class PlayerUIController : MonoBehaviour
 
     private void BuyWeapon(int buttonIndex)
     {
+        print($"Button with index {buttonIndex} was called");
         WeaponMetadata weapon = Weapon.weapons[buttonIndex];
+
         if(playerController.money >= weapon.price && !weapon.bought)
         {
             playerController.money -= weapon.price;
             weapon.bought = true;
+            shopItemLabels[buttonIndex].text = "Equip " + weapon.name;
         }
         else if(weapon.bought)
         {
@@ -122,11 +144,9 @@ public class PlayerUIController : MonoBehaviour
         }
         else
         {
-            print($"You can not afford the {weapon.name} :(");
+            shopItemLabels[buttonIndex].text = "Can't afford!";
         }
     }
-
-
     private void UpdateMoneyCounter(object value) => moneyCounter.text = $"$$$: {value}";
 
     /// <summary>

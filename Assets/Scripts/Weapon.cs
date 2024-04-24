@@ -29,10 +29,10 @@ public class Weapon : MonoBehaviour
 
     public static WeaponMetadata[] weapons = new WeaponMetadata[4]
     {
-        new("Pistol", 3, 100, 0.65f, 10, false, true),
-        new("SMG", 2, 150, 6, 0.3f, true, false),
-        new("Sniper", 5, 350, 20, 1f, false, false),
-        new("Assault_Rifle", 4, 600, 10, 0.5f, true, false)
+        new("Pistol", 3, 100, 0.5f, 10, false, true),
+        new("SMG", 1, 150, 0.20f, 6, true, false),
+        new("Sniper", 5, 350, 1f, 20, false, false),
+        new("Assault_Rifle", 4, 600, 0.5f, 10, true, false)
     };
     public static WeaponMetadata pistol => weapons[0];
     public static WeaponMetadata smg => weapons[1];

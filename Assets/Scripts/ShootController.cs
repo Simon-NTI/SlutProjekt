@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -8,12 +9,12 @@ using UnityEngine.InputSystem;
 
 public class ShootController : MonoBehaviour
 {
+    [SerializeField] TextMeshProUGUI equipedWeaponLabel;
     [SerializeField] GameObject gunRay;
     GameObject camera;
-    Vector3? debugSphereCenter;
     [SerializeField] GameObject debugSpherePrefab;
     GameObject debugSphere;
-    [SerializeField] bool debugMode, drawPlayerRayImpactPoint, drawPlayerRay;
+    [SerializeField] bool debugMode = false;
     [SerializeField] float debugSphereRadius = 0.2f;
     [SerializeField] ParticleSystem impactParticles;
     Weapon weapon;
@@ -31,7 +32,6 @@ public class ShootController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ProducePlayerRay();
         PlayerFireLogic();
         weapon.DecrementCooldown();
     }
@@ -55,14 +55,14 @@ public class ShootController : MonoBehaviour
             {
                 LineRenderer line = Instantiate(gunRay).GetComponent<LineRenderer>();
                 line.SetPosition(0, camera.transform.position);
+                line.SetPosition(1, camera.transform.position + 500 * camera.transform.forward);
 
-                if(hit.collider == null)
+                if(hit.collider != null)
                 {
-                    line.SetPosition(1, camera.transform.position + 500 * camera.transform.forward);
-                }
-                else
-                {
-                    debugSphereCenter = hit.point;
+                    if(debugMode)
+                    {
+                        debugSphere.transform.position = hit.point;
+                    }
                     // Instantiate a particle system where the player's shot impacts and point
                     // it in the same direction as the normal of the surface hit
                     Instantiate(impactParticles, hit.point, Quaternion.LookRotation(hit.normal));
@@ -71,28 +71,9 @@ public class ShootController : MonoBehaviour
         }
     }
 
-    private void ProducePlayerRay()
-    {
-        if (debugMode && drawPlayerRay)
-        {
-            Debug.DrawLine(camera.transform.position, camera.transform.position + 500 * camera.transform.forward);
-        }
-        else
-        {
-            debugSphereCenter = null;
-        }
-
-        if (debugSphereCenter != null)
-        {
-            if (debugMode && drawPlayerRayImpactPoint)
-            {
-                debugSphere.transform.position = (Vector3)debugSphereCenter;
-            }
-        }
-    }
-
     private void EquipWeapon(WeaponMetadata weaponMetadata)
     {
         weapon.SetValues(weaponMetadata);
+        equipedWeaponLabel.text = "Current Weapon: " + weapon.name.Replace("_", " ");
     }
 }
